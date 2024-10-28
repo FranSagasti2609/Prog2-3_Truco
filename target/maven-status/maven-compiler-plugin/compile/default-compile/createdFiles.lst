@@ -1,0 +1,10 @@
+com\truco\view\PanelCartasJugador$1.class
+com\truco\ai\OpenAIClient.class
+com\truco\model\Jugador.class
+com\truco\controller\JuegoController.class
+com\truco\model\Carta.class
+com\truco\view\VentanaPrincipal.class
+com\truco\ai\TrucoAI.class
+com\truco\view\PanelCartasJugador.class
+com\truco\model\Partida.class
+com\truco\utils\Configuracion.class
