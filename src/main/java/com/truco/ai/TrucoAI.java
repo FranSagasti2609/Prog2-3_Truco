@@ -31,8 +31,7 @@ public class TrucoAI {
                 JSONArray mensajes = new JSONArray();
                 JSONObject sistema = new JSONObject();
                 sistema.put("role", "system");
-                sistema.put("content", "Eres un jugador experto en Truco Argentino. Las cartas tienen el siguiente orden de fuerza de mayor a menor: 1 de Espadas, 1 de Bastos, 7 de Espadas, 7 de Oro, 3, 2, 1, 12, 11, 10, 7, 6, 5, 4. Responde solo con el nombre de la carta que deberías jugar en el formato exacto 'X de Y'. No des ninguna explicación.");
-
+                sistema.put("content", "Eres un jugador experto en Truco Argentino. Las cartas tienen el siguiente orden de fuerza de mayor a menor: 1 de Espadas, 1 de Bastos, 7 de Espadas, 7 de Oro, 3, 2, 1, 12, 11, 10, 7, 6, 5, 4. Responde solo con el nombre de la carta que deberías jugar en el formato exacto 'X P', donde 'X' es el valor y 'P' es la primera letra del palo. Ejemplos: '7 E', '10 C'. No des ninguna explicación.");
                 JSONObject usuario = new JSONObject();
                 usuario.put("role", "user");
                 usuario.put("content", construirInstruccion(cartasIA));

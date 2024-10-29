@@ -52,4 +52,7 @@ public class Carta {
         }
         return valor + " " + abreviaturaPalo;  // Ejemplo: "7E" para "7 de Espadas"
     }
+    
 }
+
+
