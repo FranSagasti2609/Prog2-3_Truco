@@ -8,6 +8,8 @@ import com.truco.model.Jugador;
 import com.truco.utils.Configuracion;
 
 import javax.swing.*;
+import javax.swing.border.Border;
+
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -22,14 +24,17 @@ public class VentanaPrincipal extends JFrame {
     private List<PanelCartasJugador> panelesJugadores;
     private int rondaActual;
     private JLabel bienvenida;  // Declarar bienvenida como variable de instancia
-
+    
+    // Crear panel inferior y configurar FlowLayout
+    private JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+   
     //Variables para gestionar los turnos y el caso de empate
     private int turnoActual;
     private Jugador jugadorVentajoso;
     
     public VentanaPrincipal() {
         setTitle("Truco Master!");
-        setSize(1280, 620);
+        setSize(1280, 720);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
@@ -45,19 +50,20 @@ public class VentanaPrincipal extends JFrame {
         bienvenida.setFont(new Font("Serif", Font.BOLD, 24));
         add(bienvenida, BorderLayout.CENTER);  // Añadir al JFrame
 
-        JButton iniciarButton = new JButton("Iniciar Partida");
+        //Agrego panel inferior con boton pvp y pvsIA
+        add(panelInferior, BorderLayout.SOUTH);
+
+        //Boton para jugar pvp
+        JButton iniciarButton = new JButton("Jugar: Jugador vs Jugador");
         iniciarButton.addActionListener(e -> iniciarPartida());
-        add(iniciarButton, BorderLayout.SOUTH);
+        panelInferior.add(iniciarButton);
 
-        //Botones de selección del modo de juego, jugador vs jugador o contra IA
-        /* 
-        JButton pvp = new JButton("Jugador vs Jugador");
-        add(pvp, BorderLayout.SOUTH);
+        //Boton para jugar PvsIA
+        JButton pvsIA = new JButton("Jugar: Jugador vs IA");
+        pvsIA.addActionListener(e -> iniciarPartidaIA());
+        panelInferior.add(pvsIA);
 
-        JButton pvsIA = new JButton("Jugador vs IA");
-        add(pvsIA, BorderLayout.SOUTH);
-        */
-    }
+        }
 
     private void iniciarPartida() {
         jugadores = new ArrayList<>();
@@ -66,10 +72,10 @@ public class VentanaPrincipal extends JFrame {
         juegoController.iniciarPartida(jugadores);
 
         jugadorVentajoso = jugadores.get(0); //Definimos el jugador "1" como el que tiene ventaja, ya que el inicia.
-        // Eliminar la bienvenida del JFrame
-        remove(bienvenida);  // Ahora podemos eliminar bienvenida al ser una variable de instancia
         
-        mostrarPanelCartas(jugadores);
+        remove(bienvenida);  // Ahora podemos eliminar bienvenida al ser una variable de instancia
+        panelInferior.setVisible(false); //oculto botones al iniciar partida
+        mostrarPanelCartas(jugadores,false);
 
         panelCartasCentro = new JPanel(new FlowLayout());
         panelCartasCentro.setBorder(BorderFactory.createTitledBorder("Cartas Jugadas"));
@@ -78,7 +84,37 @@ public class VentanaPrincipal extends JFrame {
         revalidate();  // Actualizar la interfaz
         repaint();     // Redibujar la ventana
     }
- 
+
+    private void iniciarPartidaIA(){
+        // Crear lista de jugadores con un jugador humano y una IA
+        List<Jugador> jugadoresIA = new ArrayList<>();
+        jugadoresIA.add(new Jugador("Jugador 1"));
+        jugadoresIA.add(new Jugador("IA"));
+    
+        // Asignar la lista de IA a la variable de instancia `jugadores`
+        jugadores = jugadoresIA;
+    
+       juegoController.iniciarPartida(jugadores);
+    
+       jugadorVentajoso = jugadores.get(0);
+    
+        // Remover la pestania de bienvenida y botones
+        remove(bienvenida);
+        panelInferior.setVisible(false);    
+
+        // Mostrar el panel de cartas usando la lista actualizada de jugadores
+        mostrarPanelCartas(jugadores,true);
+            
+        // Configurar el panel central para mostrar cartas jugadas
+        panelCartasCentro = new JPanel(new FlowLayout());
+        panelCartasCentro.setBorder(BorderFactory.createTitledBorder("Cartas Jugadas"));
+        add(panelCartasCentro, BorderLayout.CENTER);
+    
+        // Actualizar la interfaz
+        revalidate();
+        repaint();
+    }
+     
     private void limpiarPanelCartas() {
         for (PanelCartasJugador panel : panelesJugadores) {
             panel.removeAll();  // Elimina todos los componentes del panel
@@ -87,12 +123,17 @@ public class VentanaPrincipal extends JFrame {
         }
     }
 
-    private void mostrarPanelCartas(List<Jugador> jugadores) {
+    private void mostrarPanelCartas(List<Jugador> jugadores, boolean vsIA) {
         //Primero quitamos los contenidos de paneles anteriores.
         limpiarPanelCartas();
 
         JPanel panelCartas = new JPanel(new GridLayout(1, jugadores.size()));
+
         for (Jugador jugador : jugadores) {
+            //Si se juega contra la IA gestionamos el panel de sus cartas
+            if (vsIA && jugador.getNick().equals("IA")) {
+                continue; // Omitir el panel de la IA en modo contra IA
+            }
             PanelCartasJugador panelJugador = new PanelCartasJugador(jugador);
             panelesJugadores.add(panelJugador);
             panelCartas.add(panelJugador);
@@ -125,7 +166,7 @@ public class VentanaPrincipal extends JFrame {
         JLabel cartaLabel = new JLabel(carta.toString());
         cartaLabel.setPreferredSize(new Dimension(80, 120));
         panelCartasCentro.add(cartaLabel);
-        cartasJugadas.add(carta);
+        cartasJugadas.add(carta);   
 
         //Borrar carta, esto con el fin de que la mano disponible baje y asi poder repartir luego
         jugador.getCartas().remove(carta);
@@ -173,15 +214,15 @@ public class VentanaPrincipal extends JFrame {
     private void desactivarJuego() {
         // Remover todos los componentes del contenido actual de la ventana
         getContentPane().removeAll();
-        
+    
         // Agregar nuevamente el mensaje de bienvenida y el botón de inicio
         bienvenida = new JLabel("¡La partida ha terminado!", SwingConstants.CENTER);
         bienvenida.setFont(new Font("Serif", Font.BOLD, 24));
         add(bienvenida, BorderLayout.CENTER);
-    
-        JButton iniciarButton = new JButton("Iniciar Partida");
-        iniciarButton.addActionListener(e -> iniciarPartida());
-        add(iniciarButton, BorderLayout.SOUTH);
+       
+       //Reactivo los botones y los agrego a las ventana.
+        panelInferior.setVisible(true);
+        add(panelInferior, BorderLayout.SOUTH);
     
         // Actualizar la interfaz
         revalidate();
@@ -211,8 +252,8 @@ public class VentanaPrincipal extends JFrame {
             JOptionPane.showMessageDialog(this, "Repartiendo nuevas cartas...");
             juegoController.repartirCartas(jugadores, 3);
             //Actualizo la interfaz
-            mostrarPanelCartas(jugadores);
-            
+            limpiarPanelCartas();
+            mostrarPanelCartas(jugadores,true);
         }
 
 
@@ -229,7 +270,7 @@ public class VentanaPrincipal extends JFrame {
             turnoActual = jugadores.indexOf(ganador);
         }
 
-        rondaActual++;
+        
     }
 
    

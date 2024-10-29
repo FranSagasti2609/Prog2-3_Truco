@@ -41,7 +41,7 @@ public class JuegoController {
         System.out.println("Partida iniciada con " + jugadores.size() + " jugadores.");
     }
 
-    public Carta repartirCarta() {
+      public Carta repartirCarta() {
         if (mazo.isEmpty()) {
             throw new IllegalStateException("El mazo está vacío.");
         }
