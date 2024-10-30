@@ -178,16 +178,9 @@ public class VentanaPrincipal extends JFrame {
 
         // Cambiar turno al siguiente jugador
         turnoActual = (turnoActual + 1) % jugadores.size();
-        System.out.println("turnoActual cambio a : " + turnoActual);
+        //System.out.println("turnoActual cambio a : " + turnoActual);
 
-    // La IA sugiere una carta para el jugador actual
-        if (turnoActual == 0) {
-            jugarCartaIA(jugadores.get(0), jugadores.get(0).getCartas()); // Sugerencia para J1
-        } else {
-            jugarCartaIA(jugadores.get(1), jugadores.get(1).getCartas()); // Sugerencia para J2
-        }
-    
-
+     
         // Si ambos jugadores han jugado una carta, evaluar la mano
         if (cartasJugadas.size() == 2) {
             evaluarGanadorDeMano();
@@ -197,11 +190,24 @@ public class VentanaPrincipal extends JFrame {
             rondaActual++;
         }
 
+        // La IA sugiere una carta para el jugador actual
+        if (turnoActual == 0) {
+
+            jugarCartaIA(jugadores.get(0), jugadores.get(0).getCartas()); // Sugerencia para J1
+        } else {
+            jugarCartaIA(jugadores.get(1), jugadores.get(1).getCartas()); // Sugerencia para J2
+        }
+
         revalidate();
         repaint();
     }
 
     public void jugarCartaIA(Jugador jugadorIA, List<Carta> cartasIA) {
+        if (cartasIA.isEmpty()) {
+            System.out.println("La IA no tiene cartas para jugar.");
+            return;  // No hacer nada si la IA no tiene cartas
+        }
+    
         String apiKey = Configuracion.obtenerApiKey();
         if (apiKey == null) {
             JOptionPane.showMessageDialog(this, "No se pudo cargar la clave de API.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -209,46 +215,40 @@ public class VentanaPrincipal extends JFrame {
         }
         
         TrucoAI trucoAI = new TrucoAI(new OpenAIClient(apiKey));
-        //cartaSugerida es la carta que siempre ganaria.
+        // cartaSugerida es la carta que la IA sugiere jugar
         String cartaSugerida = trucoAI.decidirJugada(cartasIA, cartasJugadas, rondaActual);
-
-        if(!contraIA){ //Al jugar humano contra humano se brindan las sugerencias
-        // Mostrar la sugerencia al jugador humano sin jugar la carta automáticamente
-        JOptionPane.showMessageDialog(this, "La IA sugiere jugar: " + cartaSugerida + ".", "Sugerencia de IA", JOptionPane.INFORMATION_MESSAGE);
-
-        // El jugador puede decidir qué carta jugar manualmente
-        JOptionPane.showMessageDialog(this, "Ahora elige la carta que prefieras jugar manualmente.", "Decisión del Jugador", JOptionPane.INFORMATION_MESSAGE);
-        } else { //la IA juega directamente
-
+    
+        if (!contraIA) { // Al jugar humano contra humano, se brindan las sugerencias
+            JOptionPane.showMessageDialog(this, "La IA sugiere jugar: " + cartaSugerida + ".", "Sugerencia de jugada de IA.", JOptionPane.INFORMATION_MESSAGE);
+        } else { // la IA juega directamente en modo PvE
             Carta cartaElegida = null;
-            for (Carta carta : cartasIA){
-                if (carta.toString().equals(cartaSugerida)){
+            for (Carta carta : cartasIA) {
+                if (carta.toString().equals(cartaSugerida)) {
                     cartaElegida = carta;
-                    break; //Compara y elige la carta sugerida por el chatGPT
+                    break;
                 }
             }
-            if (cartaElegida != null) { //si la encuentra la juega. 
-                // Añadir la carta de la IA al centro de la mesa
+    
+            if (cartaElegida != null) {
                 JLabel cartaLabel = new JLabel(cartaElegida.toString());
                 cartaLabel.setPreferredSize(new Dimension(80, 120));
                 panelCartasCentro.add(cartaLabel);
                 cartasJugadas.add(cartaElegida);
-        
-                // Remover la carta elegida de la mano de la IA
                 jugadorIA.getCartas().remove(cartaElegida);
-        
+    
+                // Refrescar el panel para que la carta se muestre inmediatamente
+                panelCartasCentro.revalidate();
+                panelCartasCentro.repaint();
+    
                 // Cambiar turno al jugador humano
                 turnoActual = 0;
-                
-                revalidate();
-                repaint();
             } else {
                 JOptionPane.showMessageDialog(this, "La IA no pudo seleccionar una carta válida.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
-        
-  
     }
+    
+        
 
     private void desactivarJuego() {
         // Remover todos los componentes del contenido actual de la ventana
@@ -295,7 +295,7 @@ public class VentanaPrincipal extends JFrame {
             mostrarPanelCartas(jugadores,true);
         }
 
-            //Verificar si esta la condicion de finalizar la partida
+        //Verificar si esta la condicion de finalizar la partida
         if(juegoController.terminarPartida()){
             JOptionPane.showMessageDialog(this, "La partida ha terminado! El ganador es: " + ganador.getNick(), 
                                       "Partida Finalizada", JOptionPane.INFORMATION_MESSAGE);
@@ -303,6 +303,7 @@ public class VentanaPrincipal extends JFrame {
             desactivarJuego();
             return;
         }
+
          // Cambiar turno si hay un ganador, mantenerlo si hay empate
          if (ganador != null) {
             turnoActual = jugadores.indexOf(ganador);
