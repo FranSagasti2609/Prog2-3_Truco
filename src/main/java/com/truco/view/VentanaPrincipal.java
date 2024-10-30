@@ -203,11 +203,7 @@ public class VentanaPrincipal extends JFrame {
     }
 
     public void jugarCartaIA(Jugador jugadorIA, List<Carta> cartasIA) {
-        if (cartasIA.isEmpty()) {
-            System.out.println("La IA no tiene cartas para jugar.");
-            return;  // No hacer nada si la IA no tiene cartas
-        }
-    
+            
         String apiKey = Configuracion.obtenerApiKey();
         if (apiKey == null) {
             JOptionPane.showMessageDialog(this, "No se pudo cargar la clave de API.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -219,7 +215,7 @@ public class VentanaPrincipal extends JFrame {
         String cartaSugerida = trucoAI.decidirJugada(cartasIA, cartasJugadas, rondaActual);
     
         if (!contraIA) { // Al jugar humano contra humano, se brindan las sugerencias
-            JOptionPane.showMessageDialog(this, "La IA sugiere jugar: " + cartaSugerida + ".", "Sugerencia de jugada de IA.", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "La IA sugiere jugar al usuario " + jugadorIA.getNick() + ": " + cartaSugerida + ".", "Sugerencia de jugada de IA.", JOptionPane.INFORMATION_MESSAGE);
         } else { // la IA juega directamente en modo PvE
             Carta cartaElegida = null;
             for (Carta carta : cartasIA) {
@@ -268,7 +264,6 @@ public class VentanaPrincipal extends JFrame {
         repaint();
     }
     
-
     private void evaluarGanadorDeMano() {
         // Determinar el ganador de la mano utilizando el método de JuegoController
         Jugador ganador = juegoController.evaluarGanador(cartasJugadas, jugadores);
@@ -285,6 +280,10 @@ public class VentanaPrincipal extends JFrame {
             panel.actualizarPuntaje();
         }
 
+         // Limpiar las cartas jugadas y el panel central para la próxima ronda
+        cartasJugadas.clear();
+        panelCartasCentro.removeAll();
+        
         //Repartir cartas si ambos jugadores se han quedado sin cartas. 
         if(jugadores.get(0).getCartas().isEmpty() && jugadores.get(1).getCartas().isEmpty()){
             //Reparto cartas
