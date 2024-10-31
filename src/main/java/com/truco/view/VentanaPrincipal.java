@@ -162,48 +162,41 @@ public class VentanaPrincipal extends JFrame {
             JOptionPane.showMessageDialog(this, "No es el turno de " + jugador.getNick());
             return;
         }
-        
+    
         // Ocultar la carta seleccionada y hacerla no clickeable
         cartaButton.setEnabled(false);
         cartaButton.setVisible(false);
-
-        // Añadir la carta al centro
-        JLabel cartaLabel = new JLabel(carta.toString());
-        cartaLabel.setPreferredSize(new Dimension(80, 120));
-        panelCartasCentro.add(cartaLabel);
-        cartasJugadas.add(carta);   
-
-        //Borrar carta, esto con el fin de que la mano disponible baje y asi poder repartir luego
+    
+        // Mostrar la carta jugada en el panel central
+        JButton cartaView = new JButton(carta.toString());
+        cartaView.setPreferredSize(new Dimension(80, 120));
+        panelCartasCentro.add(cartaView);
+    
+        // Añadir la carta a las jugadas y removerla de la mano del jugador
+        cartasJugadas.add(carta);
         jugador.getCartas().remove(carta);
-
+    
         // Cambiar turno al siguiente jugador
         turnoActual = (turnoActual + 1) % jugadores.size();
-        //System.out.println("turnoActual cambio a : " + turnoActual);
-
-     
+    
         // Si ambos jugadores han jugado una carta, evaluar la mano
         if (cartasJugadas.size() == 2) {
-            evaluarGanadorDeMano();
-            // Limpiar las cartas jugadas para la próxima ronda
-            cartasJugadas.clear();
-            panelCartasCentro.removeAll();
+            evaluarGanadorDeMano();  // Limpia el panel después de evaluar la mano
             rondaActual++;
         }
-
-        // La IA sugiere una carta para el jugador actual
+    
+        // Muestra la sugerencia de la IA o cambia el turno al siguiente jugador en PvP
         if (turnoActual == 0) {
-
-            jugarCartaIA(jugadores.get(0), jugadores.get(0).getCartas()); // Sugerencia para J1
+            jugarCartaIA(jugadores.get(0), jugadores.get(0).getCartas());
         } else {
-            jugarCartaIA(jugadores.get(1), jugadores.get(1).getCartas()); // Sugerencia para J2
+            jugarCartaIA(jugadores.get(1), jugadores.get(1).getCartas());
         }
-
+    
         revalidate();
         repaint();
     }
-
+    
     public void jugarCartaIA(Jugador jugadorIA, List<Carta> cartasIA) {
-            
         String apiKey = Configuracion.obtenerApiKey();
         if (apiKey == null) {
             JOptionPane.showMessageDialog(this, "No se pudo cargar la clave de API.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -226,9 +219,12 @@ public class VentanaPrincipal extends JFrame {
             }
     
             if (cartaElegida != null) {
-                JLabel cartaLabel = new JLabel(cartaElegida.toString());
-                cartaLabel.setPreferredSize(new Dimension(80, 120));
-                panelCartasCentro.add(cartaLabel);
+                // Añadir la carta jugada al panel central
+                JButton cartaViewIA = new JButton(cartaElegida.toString());
+                cartaViewIA.setPreferredSize(new Dimension(80, 120));
+                panelCartasCentro.add(cartaViewIA);
+                
+                // Agregar la carta a las cartas jugadas y removerla de la mano del jugador IA
                 cartasJugadas.add(cartaElegida);
                 jugadorIA.getCartas().remove(cartaElegida);
     
@@ -244,8 +240,8 @@ public class VentanaPrincipal extends JFrame {
         }
     }
     
+    
         
-
     private void desactivarJuego() {
         // Remover todos los componentes del contenido actual de la ventana
         getContentPane().removeAll();
@@ -265,6 +261,7 @@ public class VentanaPrincipal extends JFrame {
     }
     
     private void evaluarGanadorDeMano() {
+
         // Determinar el ganador de la mano utilizando el método de JuegoController
         Jugador ganador = juegoController.evaluarGanador(cartasJugadas, jugadores);
 
@@ -279,7 +276,6 @@ public class VentanaPrincipal extends JFrame {
         for (PanelCartasJugador panel : panelesJugadores) {
             panel.actualizarPuntaje();
         }
-
          // Limpiar las cartas jugadas y el panel central para la próxima ronda
         cartasJugadas.clear();
         panelCartasCentro.removeAll();
@@ -314,7 +310,6 @@ public class VentanaPrincipal extends JFrame {
         }
     }
 
-   
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             VentanaPrincipal ventana = new VentanaPrincipal();

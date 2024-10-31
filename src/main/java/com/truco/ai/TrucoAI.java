@@ -14,6 +14,7 @@ public class TrucoAI {
     public TrucoAI(OpenAIClient openAIClient) {
         this.openAIClient = openAIClient;
     }
+    
 
     //Metodo
     public String decidirJugada(List<Carta> cartasIA, List<Carta> cartasJugadas, int rondaActual) {
