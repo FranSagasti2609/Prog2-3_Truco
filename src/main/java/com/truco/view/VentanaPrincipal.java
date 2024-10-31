@@ -227,11 +227,19 @@ public class VentanaPrincipal extends JFrame {
                 // Agregar la carta a las cartas jugadas y removerla de la mano del jugador IA
                 cartasJugadas.add(cartaElegida);
                 jugadorIA.getCartas().remove(cartaElegida);
-    
+                
+                JOptionPane.showMessageDialog(this, "La IA jugo la carta: " + cartaElegida.toString());
+
                 // Refrescar el panel para que la carta se muestre inmediatamente
                 panelCartasCentro.revalidate();
                 panelCartasCentro.repaint();
-    
+
+                //Evaluamos mano, cuando la IA o humano juega.
+                if(cartasJugadas.size() == 2) {
+                    evaluarGanadorDeMano();
+                    rondaActual++;
+                }
+
                 // Cambiar turno al jugador humano
                 turnoActual = 0;
             } else {
@@ -239,7 +247,6 @@ public class VentanaPrincipal extends JFrame {
             }
         }
     }
-    
     
         
     private void desactivarJuego() {
