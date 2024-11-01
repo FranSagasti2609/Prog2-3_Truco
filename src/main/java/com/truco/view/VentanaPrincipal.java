@@ -17,6 +17,47 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class VentanaPrincipal extends JFrame {
+
+    //Crear ventanas para pedir el nombre al usuario. 
+    public String pedirNombreUsuario() {
+        // Crear un JDialog modal para solicitar el nombre del usuario
+        JDialog dialog = new JDialog(this, "Ingrese su nombre", true);
+        dialog.setLayout(new BorderLayout());
+        dialog.setSize(300, 150);
+        dialog.setLocationRelativeTo(this); // Centra el diálogo en la ventana principal
+
+        // Crear el campo de texto
+        JTextField campoNombre = new JTextField();
+        JButton botonConfirmar = new JButton("Confirmar");
+
+        // Panel para el campo de texto
+        JPanel panelCentro = new JPanel(new BorderLayout());
+        panelCentro.add(new JLabel("Nombre del Usuario:"), BorderLayout.NORTH);
+        panelCentro.add(campoNombre, BorderLayout.CENTER);
+        
+        // Panel para los botones
+        JPanel panelInferior = new JPanel(new FlowLayout());
+        panelInferior.add(botonConfirmar);
+
+        // Agregar componentes al diálogo
+        dialog.add(panelCentro, BorderLayout.CENTER);
+        dialog.add(panelInferior, BorderLayout.SOUTH);
+
+        // Variable para almacenar el nombre ingresado
+        final String[] nombreUsuario = {null};
+
+        // Acción del botón Confirmar
+        botonConfirmar.addActionListener(e -> {
+            nombreUsuario[0] = campoNombre.getText().trim();
+            dialog.dispose(); // Cerrar el diálogo después de confirmar
+        });
+
+        // Mostrar el diálogo
+        dialog.setVisible(true);
+
+        return nombreUsuario[0];
+    }
+
     private JuegoController juegoController;
     private List<Jugador> jugadores;
     private JPanel panelCartasCentro;
@@ -71,8 +112,16 @@ public class VentanaPrincipal extends JFrame {
     private void iniciarPartida() {
         contraIA = false;
         jugadores = new ArrayList<>();
-        jugadores.add(new Jugador("Jugador 1"));
-        jugadores.add(new Jugador("Jugador 2"));
+        //Creo el jugador 1 y le pido su nombre.
+        jugadores.add(new Jugador());
+        JOptionPane.showMessageDialog(this,"Jugador 1, ingrese su nombre en la siguiente ventana.");
+        jugadores.get(0).setNick(pedirNombreUsuario());
+
+         //Creo el jugador 2 y le pido su nombre.
+        jugadores.add(new Jugador());
+        JOptionPane.showMessageDialog(this,"Jugador 2, ingrese su nombre en la siguiente ventana.");
+        jugadores.get(1).setNick(pedirNombreUsuario());
+        
         juegoController.iniciarPartida(jugadores);
 
         jugadorVentajoso = jugadores.get(0); //Definimos el jugador "1" como el que tiene ventaja, ya que el inicia.
@@ -93,7 +142,12 @@ public class VentanaPrincipal extends JFrame {
         contraIA = true;
         // Crear lista de jugadores con un jugador humano y una IA
         List<Jugador> jugadoresIA = new ArrayList<>();
-        jugadoresIA.add(new Jugador("Jugador 1"));
+
+        //Creo al jugador y le pido su nombre.
+        jugadoresIA.add(new Jugador());
+        JOptionPane.showMessageDialog(this,"Jugador, ingrese su nombre en la siguiente ventana.");
+        jugadoresIA.get(0).setNick(pedirNombreUsuario());
+
         jugadoresIA.add(new Jugador("IA"));
     
         // Asignar la lista de IA a la variable de instancia `jugadores`
@@ -209,7 +263,7 @@ public class VentanaPrincipal extends JFrame {
     
         if (!contraIA) { // Al jugar humano contra humano, se brindan las sugerencias
             JOptionPane.showMessageDialog(this, "La IA sugiere jugar al usuario " + jugadorIA.getNick() + ": " + cartaSugerida + ".", "Sugerencia de jugada de IA.", JOptionPane.INFORMATION_MESSAGE);
-        } else if(turnoActual == 1){ // la IA juega directamente en modo PvE
+        } else if(turnoActual == 1){ //Si estamos contra la IA, y ES SU TURNO, que juegue una carta. Con esto garantizamos un flujo correcto de funcionamiento.
             Carta cartaElegida = null;
             for (Carta carta : cartasIA) {
                 if (carta.toString().equals(cartaSugerida)) {
@@ -321,6 +375,7 @@ public class VentanaPrincipal extends JFrame {
         SwingUtilities.invokeLater(() -> {
             VentanaPrincipal ventana = new VentanaPrincipal();
             ventana.setVisible(true);
+
         });
     }
 }

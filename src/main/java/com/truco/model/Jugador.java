@@ -17,6 +17,13 @@ public class Jugador {
 
     }
 
+    //Constructor sin el nombre
+    public Jugador() {
+        this.puntaje = 0; //su puntaje arranca en cero
+        this.cartas = new ArrayList<>();
+
+    }
+
     //metodos get y set
     public String getNick() {
         return nick;
