@@ -209,7 +209,7 @@ public class VentanaPrincipal extends JFrame {
     
         if (!contraIA) { // Al jugar humano contra humano, se brindan las sugerencias
             JOptionPane.showMessageDialog(this, "La IA sugiere jugar al usuario " + jugadorIA.getNick() + ": " + cartaSugerida + ".", "Sugerencia de jugada de IA.", JOptionPane.INFORMATION_MESSAGE);
-        } else { // la IA juega directamente en modo PvE
+        } else if(turnoActual == 1){ // la IA juega directamente en modo PvE
             Carta cartaElegida = null;
             for (Carta carta : cartasIA) {
                 if (carta.toString().equals(cartaSugerida)) {
