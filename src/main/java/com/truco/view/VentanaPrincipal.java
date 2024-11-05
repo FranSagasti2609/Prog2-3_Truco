@@ -77,12 +77,12 @@ public class VentanaPrincipal extends JFrame {
         panelesJugadores = new ArrayList<>();
 
             // Cargar el icono y establecerlo en la ventana
-        ImageIcon icon = new ImageIcon(getClass().getResource("/images/icono.png"));
+        ImageIcon icon = new ImageIcon(getClass().getResource("/images/icon.jpeg"));
         setIconImage(icon.getImage());
 
         // Configurar el panel de bienvenida con imagen de fondo
         fondoMainMenu = new JPanel() {
-        private Image imagenFondo = new ImageIcon(getClass().getResource("/images/icono.png")).getImage();
+        private Image imagenFondo = new ImageIcon(getClass().getResource("/images/main.png")).getImage();
 
         @Override
         protected void paintComponent(Graphics g) {
@@ -178,7 +178,6 @@ public class VentanaPrincipal extends JFrame {
         repaint();     // Redibujar la ventana
     }
     
-
     private void limpiarPanelCartas() {
         for (PanelCartasJugador panel : panelesJugadores) {
             panel.removeAll();
