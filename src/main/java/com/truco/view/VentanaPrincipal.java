@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class VentanaPrincipal extends JFrame {
+    
+    private JPanel fondoMainMenu; // Panel para poner imágenes en el menú principal
 
     public String pedirNombreUsuario() {
         JDialog dialog = new JDialog(this, "Ingrese su nombre", true);
@@ -74,10 +76,23 @@ public class VentanaPrincipal extends JFrame {
         rondaActual = 1;
         panelesJugadores = new ArrayList<>();
 
-        bienvenida = new JLabel("Bienvenido al juego de Truco", SwingConstants.CENTER);
-        bienvenida.setFont(new Font("Serif", Font.BOLD, 24));
-        add(bienvenida, BorderLayout.CENTER);
+            // Cargar el icono y establecerlo en la ventana
+        ImageIcon icon = new ImageIcon(getClass().getResource("/images/icono.png"));
+        setIconImage(icon.getImage());
 
+        // Configurar el panel de bienvenida con imagen de fondo
+        fondoMainMenu = new JPanel() {
+        private Image imagenFondo = new ImageIcon(getClass().getResource("/images/icono.png")).getImage();
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            g.drawImage(imagenFondo, 0, 0, getWidth(), getHeight(), this);
+        }
+    };
+    
+    fondoMainMenu.setLayout(new BorderLayout());
+    setContentPane(fondoMainMenu);
         add(panelInferior, BorderLayout.SOUTH);
 
         JButton iniciarButton = new JButton("Jugar: Jugador vs Jugador");
@@ -92,63 +107,77 @@ public class VentanaPrincipal extends JFrame {
     private void iniciarPartida() {
         contraIA = false;
         jugadores = new ArrayList<>();
-
+    
         jugadores.add(new Jugador());
         JOptionPane.showMessageDialog(this, "Jugador 1, ingrese su nombre en la siguiente ventana.");
         jugadores.get(0).setNick(pedirNombreUsuario());
-
+    
         jugadores.add(new Jugador());
         JOptionPane.showMessageDialog(this, "Jugador 2, ingrese su nombre en la siguiente ventana.");
         jugadores.get(1).setNick(pedirNombreUsuario());
-
+    
         juegoController.iniciarPartida(jugadores);
         jugadorVentajoso = jugadores.get(0);
-
-        remove(bienvenida);
-        panelInferior.setVisible(false);
-        mostrarPanelCartas(jugadores, false);
-
+    
+        // Crear un nuevo JPanel para la interfaz de juego y establecerlo como contentPane
+        JPanel panelJuego = new JPanel(new BorderLayout());
+        setContentPane(panelJuego);  // Reemplazamos el contentPane con el panel de juego
+    
+        // Configurar el panel central para mostrar cartas jugadas
         panelCartasCentro = new JPanel(new FlowLayout());
         panelCartasCentro.setBorder(BorderFactory.createTitledBorder("Cartas Jugadas"));
-        add(panelCartasCentro, BorderLayout.CENTER);
-
-        revalidate();
-        repaint();
+        panelJuego.add(panelCartasCentro, BorderLayout.CENTER);
+    
+        panelInferior.setVisible(false); // Ocultar los botones del menú principal
+        mostrarPanelCartas(jugadores, false); // Mostrar el panel de cartas de jugadores
+    
+        revalidate();  // Actualizar la interfaz
+        repaint();     // Redibujar la ventana
     }
+    
+    
 
     private void iniciarPartidaIA() {
         contraIA = true;
         List<Jugador> jugadoresIA = new ArrayList<>();
-
+    
         jugadoresIA.add(new Jugador());
         JOptionPane.showMessageDialog(this, "Jugador, ingrese su nombre en la siguiente ventana.");
         jugadoresIA.get(0).setNick(pedirNombreUsuario());
-
+    
         jugadoresIA.add(new Jugador("IA"));
         jugadores = jugadoresIA;
-
+    
         juegoController.iniciarPartida(jugadores);
         jugadorVentajoso = jugadores.get(0);
-
-        remove(bienvenida);
-        panelInferior.setVisible(false);
-        mostrarPanelCartas(jugadores, true);
-
-        JPanel panelPuntajeIA = new JPanel(new FlowLayout());
-        panelPuntajeIA.setBorder(BorderFactory.createTitledBorder("Puntos IA"));
-
-        puntajeIA = new JLabel("Puntos: " + jugadores.get(1).getPuntaje());
-        panelPuntajeIA.add(puntajeIA);
-
-        add(panelPuntajeIA, BorderLayout.EAST);
-
+    
+        // Crear un nuevo JPanel para la interfaz de juego y establecerlo como contentPane
+        JPanel panelJuego = new JPanel(new BorderLayout());
+        setContentPane(panelJuego);  // Reemplazamos el contentPane con el panel de juego
+    
+        // Configurar el panel central para mostrar cartas jugadas
         panelCartasCentro = new JPanel(new FlowLayout());
         panelCartasCentro.setBorder(BorderFactory.createTitledBorder("Cartas Jugadas"));
-        add(panelCartasCentro, BorderLayout.CENTER);
-
-        revalidate();
-        repaint();
+        panelJuego.add(panelCartasCentro, BorderLayout.CENTER);
+    
+        // Ocultar el fondo del menú principal y el panel inferior
+        panelInferior.setVisible(false);
+    
+        mostrarPanelCartas(jugadores, true); // Mostrar el panel de cartas de jugadores
+    
+        // Configuración del panel de puntaje de la IA
+        JPanel panelPuntajeIA = new JPanel(new FlowLayout());
+        panelPuntajeIA.setBorder(BorderFactory.createTitledBorder("Puntos IA"));
+    
+        puntajeIA = new JLabel("Puntos: " + jugadores.get(1).getPuntaje());
+        panelPuntajeIA.add(puntajeIA);
+    
+        panelJuego.add(panelPuntajeIA, BorderLayout.EAST);
+    
+        revalidate();  // Actualizar la interfaz
+        repaint();     // Redibujar la ventana
     }
+    
 
     private void limpiarPanelCartas() {
         for (PanelCartasJugador panel : panelesJugadores) {
