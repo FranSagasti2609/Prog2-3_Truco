@@ -75,10 +75,13 @@ public class JuegoController {
         throw new IllegalArgumentException("La evaluación debe hacerse con exactamente dos cartas.");
     }
 
-    // Lista de fuerza para determinar el puntaje
     String[] ordenFuerza = {
         "1 E", "1 B", "7 E", "7 O",
-        "3", "2", "1", "12", "11", "10", "7", "6", "5", "4"};
+        "3", "2", "1 C", "1 O",
+        "12", "11", "10", "7 C", "7 B",
+        "6", "5", "4"
+    };
+    
 
     // Calcular los puntajes de las dos cartas basados en el orden de la lista de fuerza
     int[] puntajes = new int[2];
