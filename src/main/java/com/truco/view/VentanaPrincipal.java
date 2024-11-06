@@ -77,7 +77,7 @@ public class VentanaPrincipal extends JFrame {
         panelesJugadores = new ArrayList<>();
 
             // Cargar el icono y establecerlo en la ventana
-        ImageIcon icon = new ImageIcon(getClass().getResource("/images/icon.jpeg"));
+        ImageIcon icon = new ImageIcon(getClass().getResource("/images/icon.png"));
         setIconImage(icon.getImage());
 
         // Configurar el panel de bienvenida con imagen de fondo
